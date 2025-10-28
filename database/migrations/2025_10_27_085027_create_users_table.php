@@ -16,7 +16,7 @@ return new class extends Migration
 
             // Relasi ke koperasi
             $table->foreignId('koperasi_id')
-                ->constrained('koperasi')
+                ->constrained('koperasis')
                 ->onDelete('cascade');
 
             // Info anggota
