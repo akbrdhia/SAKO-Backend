@@ -9,7 +9,7 @@ class Simpanan extends Model
 {
     use HasFactory;
 
-    protected $table = 'simpanan';
+    protected $table = 'simpanans';
 
     protected $fillable = [
         'koperasi_id',

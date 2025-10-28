@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -33,6 +32,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed', // ← TAMBAH INI (Laravel 11 feature)
     ];
 
     /*
@@ -74,6 +74,22 @@ class User extends Authenticatable
         return $this->role === 'anggota';
     }
 
+    public function isKasir()
+    {
+        return $this->role === 'kasir';
+    }
+
+    public function isManajer()
+    {
+        return $this->role === 'manajer';
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    // Scopes
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
@@ -82,5 +98,30 @@ class User extends Authenticatable
     public function scopeByRole($query, $role)
     {
         return $query->where('role', $role);
+    }
+
+    public function scopeAnggota($query)
+    {
+        return $query->where('role', 'anggota');
+    }
+
+    public function scopeKasir($query)
+    {
+        return $query->where('role', 'kasir');
+    }
+
+    public function scopeManajer($query)
+    {
+        return $query->where('role', 'manajer');
+    }
+
+    public function scopeAdmin($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    public function scopeByKoperasi($query, $koperasiId)
+    {
+        return $query->where('koperasi_id', $koperasiId);
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Koperasi extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-    protected $table = 'koperasi';
+    protected $table = 'koperasis';
 
     protected $fillable = [
         'kode_koperasi',
@@ -27,16 +26,40 @@ class Koperasi extends Model
         'status',
     ];
 
+    // ← TAMBAH CASTS untuk type casting otomatis
+    protected $casts = [
+        'bunga_default' => 'decimal:2',
+        'max_pinjaman_multiplier' => 'integer',
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | 🔗 RELATIONSHIPS
     |--------------------------------------------------------------------------
     */
 
-    // satu koperasi punya banyak user
+    // Semua user di koperasi ini
     public function users()
     {
         return $this->hasMany(User::class, 'koperasi_id');
+    }
+
+    // Hanya anggota
+    public function anggota()
+    {
+        return $this->hasMany(User::class, 'koperasi_id')->where('role', 'anggota');
+    }
+
+    // Hanya kasir
+    public function kasir()
+    {
+        return $this->hasMany(User::class, 'koperasi_id')->where('role', 'kasir');
+    }
+
+    // Hanya manajer
+    public function manajer()
+    {
+        return $this->hasMany(User::class, 'koperasi_id')->where('role', 'manajer');
     }
 
     /*
@@ -53,5 +76,10 @@ class Koperasi extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status', 'inactive');
     }
 }
