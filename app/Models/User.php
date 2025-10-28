@@ -2,18 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class User extends Model
+class User extends Authenticatable
 {
-
-        use HasApiTokens, HasFactory, Notifiable;
-
-    protected $table = 'users';
-
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'koperasi_id',
@@ -27,6 +23,7 @@ class User extends Model
         'role',
         'status',
         'registered_by',
+        'foto_profile',
     ];
 
     protected $hidden = [
@@ -44,20 +41,19 @@ class User extends Model
     |--------------------------------------------------------------------------
     */
 
-    // user terdaftar di satu koperasi
     public function koperasi()
     {
         return $this->belongsTo(Koperasi::class, 'koperasi_id');
     }
 
-    // kalau dia anggota, bisa tahu siapa kasir yg daftarin
+    // Kasir yang mendaftarkan user
     public function registeredBy()
     {
         return $this->belongsTo(User::class, 'registered_by');
     }
 
-    // kalau dia kasir/manajer, bisa punya banyak anggota yang dia daftarin
-    public function anggotaTerdaftar()
+    // Daftar anggota yang didaftarkan kasir ini
+    public function registeredMembers()
     {
         return $this->hasMany(User::class, 'registered_by');
     }
@@ -68,36 +64,23 @@ class User extends Model
     |--------------------------------------------------------------------------
     */
 
-    // filter by role
-    public function scopeRole($query, $role)
+    public function isActive()
     {
-        return $query->where('role', $role);
+        return $this->status === 'active';
     }
 
-    // check role
     public function isAnggota()
     {
         return $this->role === 'anggota';
     }
 
-    public function isKasir()
+    public function scopeActive($query)
     {
-        return $this->role === 'kasir';
+        return $query->where('status', 'active');
     }
 
-    public function isManajer()
+    public function scopeByRole($query, $role)
     {
-        return $this->role === 'manajer';
-    }
-
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
-
-    // check status aktif
-    public function isActive()
-    {
-        return $this->status === 'active';
+        return $query->where('role', $role);
     }
 }
