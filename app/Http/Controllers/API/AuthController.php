@@ -124,8 +124,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Refresh token (optional - untuk refresh access token)
-     *
+     * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */

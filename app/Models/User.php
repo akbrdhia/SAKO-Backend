@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -58,11 +59,34 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'registered_by');
     }
 
+    // ✨ TAMBAHAN: Relasi ke tabel Simpanan
+    public function simpanan()
+    {
+        return $this->hasMany(Simpanan::class, 'user_id');
+    }
+
+    // Simpanan yang diinput oleh kasir ini
+    public function simpananCreated()
+    {
+        return $this->hasMany(Simpanan::class, 'created_by');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | 🧠 SCOPES & HELPERS
     |--------------------------------------------------------------------------
     */
+
+    // ✨ TAMBAHAN: Helper untuk total simpanan
+    public function getTotalSimpanan($jenis = null)
+    {
+        return Simpanan::getTotalByUser($this->id, $jenis);
+    }
+
+    public function getSimpananSummary()
+    {
+        return Simpanan::getSummaryByUser($this->id);
+    }
 
     public function isActive()
     {

@@ -21,45 +21,131 @@ class Simpanan extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'jumlah' => 'decimal:2',
+        'tanggal' => 'date',
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | 🔗 RELATIONSHIPS
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Koperasi yang memiliki simpanan ini
+     */
     public function koperasi()
     {
         return $this->belongsTo(Koperasi::class, 'koperasi_id');
     }
 
-    public function anggota()
+    /**
+     * Anggota yang menyimpan
+     */
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function kasir()
+    /**
+     * Kasir yang input simpanan
+     */
+    public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
     /*
     |--------------------------------------------------------------------------
-    | 💡 SCOPES & HELPERS
+    | 🧠 SCOPES
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * Scope: Filter by koperasi
+     */
+    public function scopeByKoperasi($query, $koperasiId)
+    {
+        return $query->where('koperasi_id', $koperasiId);
+    }
+
+    /**
+     * Scope: Filter by user/anggota
+     */
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Scope: Filter by jenis simpanan
+     */
     public function scopeByJenis($query, $jenis)
     {
         return $query->where('jenis', $jenis);
     }
 
-    public function scopeByAnggota($query, $userId)
+    /**
+     * Scope: Filter by tanggal range
+     */
+    public function scopeBetweenDates($query, $startDate, $endDate)
     {
-        return $query->where('user_id', $userId);
+        return $query->whereBetween('tanggal', [$startDate, $endDate]);
     }
 
-    public function getFormattedJumlahAttribute()
+    /**
+     * Scope: Order by tanggal descending
+     */
+    public function scopeLatest($query)
     {
-        return number_format($this->jumlah, 2, ',', '.');
+        return $query->orderBy('tanggal', 'desc');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 📊 STATIC METHODS (Aggregations)
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get total simpanan by user
+     */
+    public static function getTotalByUser($userId, $jenis = null)
+    {
+        $query = self::where('user_id', $userId);
+
+        if ($jenis) {
+            $query->where('jenis', $jenis);
+        }
+
+        return $query->sum('jumlah');
+    }
+
+    /**
+     * Get total simpanan by koperasi
+     */
+    public static function getTotalByKoperasi($koperasiId, $jenis = null)
+    {
+        $query = self::where('koperasi_id', $koperasiId);
+
+        if ($jenis) {
+            $query->where('jenis', $jenis);
+        }
+
+        return $query->sum('jumlah');
+    }
+
+    /**
+     * Get simpanan summary by user
+     */
+    public static function getSummaryByUser($userId)
+    {
+        return [
+            'total' => self::getTotalByUser($userId),
+            'pokok' => self::getTotalByUser($userId, 'pokok'),
+            'wajib' => self::getTotalByUser($userId, 'wajib'),
+            'sukarela' => self::getTotalByUser($userId, 'sukarela'),
+        ];
     }
 }
