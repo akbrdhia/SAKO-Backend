@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Public Auth
-    require __DIR__ . '/api/api_auth.php';
+    require __DIR__ . '/api/auth.php';
     /*
     |--------------------------------------------------------------------------
     | PROTECTED ROUTES
@@ -36,10 +36,11 @@ Route::prefix('v1')->group(function () {
     */
     Route::middleware(['auth:api'])->group(function () {
         // Group: AUTH (me, logout, refresh, change-password)
-        require __DIR__ . '/api/api_auth_protected.php';
+        require __DIR__ . '/api/auth_protected.php';
         // Group: TEST ROUTES (role based)
-        require __DIR__ . '/api/api_test.php';
+        require __DIR__ . '/api/test.php';
         // Group: USER MANAGEMENT
-        require __DIR__ . '/api/api_user.php';
+        require __DIR__ . '/api/user.php';
+        require __DIR__ . '/api/simpanan.php';
     });
 });

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('simpanans', function (Blueprint $table) {
-           $table->id();
+            $table->id();
 
             // Relasi utama
             $table->foreignId('koperasi_id')
@@ -21,7 +21,8 @@ return new class extends Migration
 
             $table->foreignId('user_id')
                 ->constrained('users')
-                ->onDelete('cascade');
+                ->onDelete('cascade')
+                ->comment('Anggota yang melakukan simpanan');
 
             // Jenis dan detail simpanan
             $table->enum('jenis', ['pokok', 'wajib', 'sukarela']);
@@ -30,16 +31,18 @@ return new class extends Migration
             $table->text('keterangan')->nullable();
 
             // Kasir yang input
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->foreign('created_by')
-                ->references('id')
-                ->on('users')
-                ->onDelete('set null');
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('set null')
+                ->comment('Kasir yang input');
 
             $table->timestamps();
 
             // Index untuk pencarian cepat per user dan tanggal
-            $table->index(['user_id', 'tanggal'], 'idx_user_tanggal');
+            $table->index(['user_id', 'jenis']);
+            $table->index(['koperasi_id', 'tanggal']);
+            $table->index('tanggal');
         });
     }
 
