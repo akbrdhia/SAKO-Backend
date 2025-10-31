@@ -1,62 +1,45 @@
 <?php
 
-use App\Http\Controllers\API\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| File utama untuk mendaftarkan semua route API.
+| Masing-masing domain (auth, user, test, dll) dipisah ke file terpisah
+| agar lebih mudah dibaca dan dikelola.
+|
+*/
 
+Route::prefix('v1')->group(function () {
     /*
     |--------------------------------------------------------------------------
     | PUBLIC ROUTES
     |--------------------------------------------------------------------------
     */
-    Route::post('/auth/login', [AuthController::class, 'login']);
     Route::get('/', function () {
         return response()->json(['message' => 'The SAKO API is running smoothly.']);
     });
 
+    // Public Auth
+    require __DIR__ . '/api/api_auth.php';
     /*
     |--------------------------------------------------------------------------
     | PROTECTED ROUTES
     |--------------------------------------------------------------------------
+    |
+    | Semua route di bawah ini hanya bisa diakses oleh user yang sudah login
+    | (karena dilindungi oleh middleware auth:api).
+    |
     */
     Route::middleware(['auth:api'])->group(function () {
-
-        // Auth endpoints
-        Route::prefix('auth')->group(function () {
-            Route::get('/me', [AuthController::class, 'me']);
-            Route::post('/logout', [AuthController::class, 'logout']);
-            Route::post('/refresh', [AuthController::class, 'refresh']);
-            Route::post('/change-password', [AuthController::class, 'changePassword']);
-        });
-
-        // Test routes untuk cek role middleware
-        Route::get('/test-anggota', function () {
-            return response()->json([
-                'message' => 'Hello Anggota!',
-                'user' => auth()->user()->nama,
-            ]);
-        })->middleware('role:anggota');
-
-        Route::get('/test-kasir', function () {
-            return response()->json([
-                'message' => 'Hello Kasir!',
-                'user' => auth()->user()->nama,
-            ]);
-        })->middleware('role:kasir');
-
-        Route::get('/test-manajer', function () {
-            return response()->json([
-                'message' => 'Hello Manajer!',
-                'user' => auth()->user()->nama,
-            ]);
-        })->middleware('role:manajer');
-
-        Route::get('/test-admin', function () {
-            return response()->json([
-                'message' => 'Hello Admin!',
-                'user' => auth()->user()->nama,
-            ]);
-        })->middleware('role:admin');
+        // Group: AUTH (me, logout, refresh, change-password)
+        require __DIR__ . '/api/api_auth_protected.php';
+        // Group: TEST ROUTES (role based)
+        require __DIR__ . '/api/api_test.php';
+        // Group: USER MANAGEMENT
+        require __DIR__ . '/api/api_user.php';
     });
 });
