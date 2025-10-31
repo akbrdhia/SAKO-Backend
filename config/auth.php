@@ -26,7 +26,7 @@ return [
         ],
 
         'api' => [
-            'driver' => 'passport', // ← PASTIKAN INI PASSPORT
+            'driver' => 'passport', 
             'provider' => 'users',
             'hash' => false,
         ],
