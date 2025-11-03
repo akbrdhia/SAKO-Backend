@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Koperasi;
 use App\Models\User;
 use App\Models\Simpanan;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -13,6 +14,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(KoperasiSeeder::class);
+        if (app()->environment('local') || app()->environment('testing')) {
+            Artisan::call('passport:client', ['--personal' => true, '--name' => 'Personal Access Client']);
+        }
         $this->command->info('');
         $this->command->info('-- LOGIN CREDENTIALS:');
         $this->command->info('');
