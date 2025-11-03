@@ -42,5 +42,6 @@ Route::prefix('v1')->group(function () {
         // Group: USER MANAGEMENT
         require __DIR__ . '/api/user.php';
         require __DIR__ . '/api/simpanan.php';
+        require __DIR__ . '/api/pinjaman.php';
     });
 });
