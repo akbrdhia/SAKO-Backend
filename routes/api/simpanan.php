@@ -3,7 +3,7 @@
 use App\Http\Controllers\API\SimpananController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:api'])->prefix('simpanan')->group(function () {
+Route::prefix('simpanan')->group(function () {
     Route::get('/', [SimpananController::class, 'index']);
     Route::post('/', [SimpananController::class, 'store'])->middleware('role:kasir,admin');
     Route::get('/{id}', [SimpananController::class, 'show']);

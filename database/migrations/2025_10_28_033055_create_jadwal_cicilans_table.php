@@ -25,20 +25,21 @@ return new class extends Migration
             // Tanggal Jatuh Tempo
             $table->date('tanggal_jatuh_tempo')->index();
 
-            // Detail Cicilan (fixed amount per cicilan)
+            // Detail Cicilan
             $table->decimal('jumlah_cicilan', 15, 2)->comment('Total cicilan (pokok + bunga)');
             $table->decimal('pokok', 15, 2)->comment('Porsi pokok');
             $table->decimal('bunga', 15, 2)->comment('Porsi bunga');
 
-            // Pembayaran Actual (nullable sampai dibayar)
+            // Pembayaran Actual
             $table->decimal('jumlah_dibayar', 15, 2)->nullable()->comment('Jumlah yang dibayar anggota');
             $table->date('tanggal_bayar')->nullable()->comment('Tanggal pembayaran actual');
 
-            // Denda (future feature)
-            // Tracking pembayaran partial (breakdown per komponen)
-            $table->decimal('jumlah_dibayar_denda', 15, 2)->default(0)->after('jumlah_dibayar');
-            $table->decimal('jumlah_dibayar_bunga', 15, 2)->default(0)->after('jumlah_dibayar_denda');
-            $table->decimal('jumlah_dibayar_pokok', 15, 2)->default(0)->after('jumlah_dibayar_bunga');
+            // Breakdown pembayaran per komponen
+            $table->decimal('jumlah_dibayar_denda', 15, 2)->default(0);
+            $table->decimal('jumlah_dibayar_bunga', 15, 2)->default(0);
+            $table->decimal('jumlah_dibayar_pokok', 15, 2)->default(0);
+
+            // Denda & keterlambatan
             $table->decimal('denda', 15, 2)->default(0)->comment('Denda keterlambatan');
             $table->integer('hari_telat')->default(0)->comment('Jumlah hari keterlambatan');
 
@@ -58,12 +59,10 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Composite index untuk query efisien
+            // Index & Constraint
             $table->index(['pinjaman_id', 'cicilan_ke']);
             $table->index(['pinjaman_id', 'status']);
-            $table->index(['status', 'tanggal_jatuh_tempo']); // Untuk cron job cek telat
-
-            // Unique constraint: 1 pinjaman tidak boleh ada 2 cicilan dengan nomor sama
+            $table->index(['status', 'tanggal_jatuh_tempo']);
             $table->unique(['pinjaman_id', 'cicilan_ke']);
         });
     }
