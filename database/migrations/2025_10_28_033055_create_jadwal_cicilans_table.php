@@ -35,6 +35,10 @@ return new class extends Migration
             $table->date('tanggal_bayar')->nullable()->comment('Tanggal pembayaran actual');
 
             // Denda (future feature)
+            // Tracking pembayaran partial (breakdown per komponen)
+            $table->decimal('jumlah_dibayar_denda', 15, 2)->default(0)->after('jumlah_dibayar');
+            $table->decimal('jumlah_dibayar_bunga', 15, 2)->default(0)->after('jumlah_dibayar_denda');
+            $table->decimal('jumlah_dibayar_pokok', 15, 2)->default(0)->after('jumlah_dibayar_bunga');
             $table->decimal('denda', 15, 2)->default(0)->comment('Denda keterlambatan');
             $table->integer('hari_telat')->default(0)->comment('Jumlah hari keterlambatan');
 
